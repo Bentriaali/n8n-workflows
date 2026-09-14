@@ -1,0 +1,256 @@
+{
+  "name": "projet8",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "contact us",
+        "formDescription": "hello Ali your are hansdome",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "whats your name"
+            },
+            {
+              "fieldLabel": "whats your email",
+              "fieldType": "email"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "561693cd-c4f6-4784-97ea-67302f3bfcdf",
+      "name": "On form submission",
+      "webhookId": "f9e64d4b-f74d-40cb-ad94-3cd3e2befbb6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e7a8c4fd-e442-4388-8345-992288506ef4",
+              "name": "message",
+              "value": "=Hello {{$json[\"whats your name\"]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "841f2c27-f727-431a-9130-2d09716eb1a7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "your-email@example.com",
+        "subject": "hello ali",
+        "message": "={{$json[\"message\"]}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        864,
+        0
+      ],
+      "id": "533366a1-cb99-4b5d-bae1-041485657001",
+      "name": "Send a message",
+      "webhookId": "df393a7c-504a-46d1-8adf-5dd4eec7b4b0"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f1118ef2-1b63-4b48-855e-efd9c5a1ff9f",
+              "leftValue": "={{$json[\"Email\"]}}",
+              "rightValue": "=@gmail.com",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        16
+      ],
+      "id": "b9b6e3de-609b-4086-b3ec-ccc8460028c0",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$json[\"whats your email\"]}}",
+        "subject": "Email not supported",
+        "message": "=Hello {{$json[\"whats your name\"]}},  Please use a Gmail address.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        864,
+        208
+      ],
+      "id": "cf59e71e-484a-4ff6-b6d3-131d89894fce",
+      "name": "Send a message1",
+      "webhookId": "a3d2ccae-e65b-486a-9bcf-1d5f765de8ad"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "n8ntest"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{$json[\"whats your name\"]}}",
+            "Email": "={{$json[\"whats your email\"]}}",
+            "Date": "={{$json[\"submittedAt\"]}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        0
+      ],
+      "id": "752a0e47-dcfc-4923-a41b-c6d971fa07b1",
+      "name": "Append row in sheet"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6ba550cd-0346-4026-bdce-e960ab34dea1",
+  "nodeGroups": [],
+  "tags": []
+}
